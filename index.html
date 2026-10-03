@@ -2,31 +2,119 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
 <title>Aula.</title>
-<style>
-body{font-family:-apple-system,system-ui,sans-serif;background:#000;color:#fff;margin:0;padding:48px 24px;line-height:1.5;max-width:520px;margin-inline:auto}
-h1{font-size:2.8rem;letter-spacing:-0.04em;margin:0 0 8px}
-a{color:#0A84FF;text-decoration:none}
-.box{background:#1C1C1E;border-radius:16px;padding:18px 20px;margin:24px 0}
-code{background:#2C2C2E;padding:2px 7px;border-radius:6px;font-size:0.88em}
-ol{padding-left:1.2em}
-</style>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#000000"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-<h1>Aula.</h1>
-<p style="color:#8E8E93">Chat en grupo para clases · canales · horario · anclas · Funko</p>
-<div class="box">
-<p><strong>Repositorio listo</strong> con esquema Supabase y config de Vercel.</p>
-<p>Para la <strong>app completa</strong> (un solo <code>index.html</code> de ~62&nbsp;KB):</p>
-<ol>
-<li>En GitHub: <em>Add file → Upload files</em></li>
-<li>Sube el <code>index.html</code> de la app y reemplaza este</li>
-<li>O clona el repo y haz <code>git push</code> con ese archivo</li>
-</ol>
-<p>Luego: <code>npx vercel --prod</code> o conecta el repo en Vercel.</p>
+<div id="app">
+  <div id="boot" class="screen on loading">Cargando Aula…</div>
+  <div id="welcome" class="screen off">
+    <div class="w-hero">
+      <div id="welcomeFunko"></div>
+      <h1 class="w-title">Aula.</h1>
+      <p class="w-sub">Chat en grupo para clases. Canales, horario y anclas. Ahora en la nube.</p>
+      <div class="w-actions">
+        <button class="btn-primary" onclick="showScreen('signup')">Crear cuenta</button>
+        <button class="btn-secondary" onclick="showScreen('login')">Iniciar sesión</button>
+      </div>
+    </div>
+  </div>
+  <div id="signup" class="screen off form-screen">
+    <button class="form-back" onclick="showScreen('welcome')">‹ Volver</button>
+    <h1 class="form-title">Crear cuenta</h1>
+    <p class="form-desc">Diseña tu Funko. La cuenta se guarda en Supabase.</p>
+    <div class="funko-designer">
+      <div id="signupFunko"></div>
+      <div class="opt-group"><span>Piel</span><div class="opt-row" id="optSkin"></div></div>
+      <div class="opt-group"><span>Pelo</span><div class="opt-row" id="optHair"></div></div>
+      <div class="opt-group"><span>Camiseta</span><div class="opt-row" id="optShirt"></div></div>
+      <div class="opt-group"><span>Fondo</span><div class="opt-row" id="optBg"></div></div>
+      <div class="opt-group"><span>Peinado</span><div class="opt-row" id="optStyle"></div></div>
+      <div class="opt-group"><span>Gafas</span><div class="opt-row" id="optGlasses"></div></div>
+    </div>
+    <div class="field"><label>Usuario (3–16)</label><input id="suUser" maxlength="16" autocomplete="username" placeholder="tu_usuario"/><div class="field-error" id="errUser"></div></div>
+    <div class="field"><label>Email</label><input id="suEmail" type="email" placeholder="tu@email.com"/><div class="field-error" id="errEmail"></div></div>
+    <div class="field"><label>Contraseña (mín. 8)</label><input id="suPass" type="password" autocomplete="new-password"/><div class="field-error" id="errPass"></div></div>
+    <div class="field"><label>Repetir contraseña</label><input id="suPass2" type="password" autocomplete="new-password"/></div>
+    <div class="check-row"><input type="checkbox" id="suAdult"/><label for="suAdult">Soy mayor de edad</label></div>
+    <button class="btn-primary" style="width:100%;margin-top:8px" id="btnSignup" onclick="doSignup()">Crear cuenta</button>
+  </div>
+  <div id="login" class="screen off form-screen">
+    <button class="form-back" onclick="showScreen('welcome')">‹ Volver</button>
+    <h1 class="form-title">Iniciar sesión</h1>
+    <p class="form-desc">Email y contraseña.</p>
+    <div class="field"><label>Email</label><input id="liEmail" type="email" autocomplete="username"/></div>
+    <div class="field"><label>Contraseña</label><input id="liPass" type="password" autocomplete="current-password"/><div class="field-error" id="errLogin"></div></div>
+    <button class="btn-primary" style="width:100%;margin-top:8px" id="btnLogin" onclick="doLogin()">Entrar</button>
+  </div>
+  <div id="main" class="screen off">
+    <div class="topbar">
+      <button class="glass-btn" id="topFunkoBtn" onclick="switchTab('settings')"></button>
+      <div class="topbar-title" id="topTitle">Chats</div>
+      <button class="glass-btn" onclick="switchTab('create')" style="color:var(--blue);font-weight:600">＋</button>
+    </div>
+    <div class="main-body">
+      <div class="tab-panel active" id="tab-chats">
+        <div class="search-bar"><span>🔍</span><input placeholder="Buscar chats" oninput="filterChats(this.value)"/></div>
+        <div id="chatsList"></div>
+        <div class="empty-state hidden" id="chatsEmpty"><div style="font-size:2.5rem">💬</div><p>Aún no tienes chats</p></div>
+      </div>
+      <div class="tab-panel" id="tab-search">
+        <div class="section-pad"><h2>Buscar</h2></div>
+        <div class="search-bar"><span>🔍</span><input id="globalSearch" placeholder="Usuario o ancla" oninput="doGlobalSearch(this.value)"/></div>
+        <div id="searchResults"></div>
+      </div>
+      <div class="tab-panel" id="tab-create">
+        <div class="section-pad">
+          <h2>Crear grupo</h2>
+          <p style="color:var(--muted);margin-bottom:16px;font-size:.95rem">Canales: general, mates, lengua, historia, inglés.</p>
+          <div class="field"><label>Nombre</label><input id="newGroupName" placeholder="Mi clase 3ºA"/></div>
+          <button class="btn-primary" style="width:100%" onclick="createGroup()">Crear</button>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-settings">
+        <div class="section-pad" style="display:flex;align-items:center;gap:14px">
+          <div id="settingsFunko"></div>
+          <div><div style="font-weight:600;font-size:1.15rem" id="settingsUser"></div><div style="color:var(--muted);font-size:.85rem">Cloud · Supabase</div></div>
+        </div>
+        <div class="settings-card">
+          <div class="settings-row danger" onclick="doLogout()">Cerrar sesión</div>
+        </div>
+      </div>
+    </div>
+    <nav class="dock">
+      <button class="dock-item on" data-tab="chats" onclick="switchTab('chats')">Chats</button>
+      <button class="dock-item" data-tab="search" onclick="switchTab('search')">Buscar</button>
+      <button class="dock-item" data-tab="create" onclick="switchTab('create')">Crear</button>
+      <button class="dock-item" data-tab="settings" onclick="switchTab('settings')">Ajustes</button>
+    </nav>
+  </div>
+  <div id="chatView" class="screen off">
+    <div class="chat-header">
+      <button class="back" onclick="closeChat()">‹</button>
+      <div class="chat-header-info">
+        <div class="ch-name" id="cvName"></div>
+        <div class="ch-sub" id="cvSub"></div>
+      </div>
+      <button onclick="openAddMember()" style="padding:8px 12px;color:var(--blue)">👤＋</button>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;position:relative;min-height:0">
+      <button class="channels-tab" id="chTab" onclick="toggleChannels()">›</button>
+      <div class="channels-panel" id="chPanel"></div>
+      <div class="messages" id="messages"></div>
+      <div class="composer">
+        <textarea class="composer-input" id="composer" rows="1" placeholder="Mensaje" oninput="onCompose(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+        <button class="composer-send" id="sendBtn" onclick="sendMsg()" disabled>↑</button>
+      </div>
+    </div>
+  </div>
+  <div class="island" id="island"><span id="islandIcon">💬</span><span class="island-text" id="islandText"></span></div>
 </div>
-<p><a href="https://github.com/mauro1gifo/aula-app">github.com/mauro1gifo/aula-app</a></p>
-<p style="color:#8E8E93;font-size:0.9rem;margin-top:32px">cloud/schema.sql · vercel.json · README</p>
+<script src="app.js"></script>
 </body>
 </html>
