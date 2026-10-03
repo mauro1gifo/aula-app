@@ -1,0 +1,4 @@
+window.AULA_CONFIG = {
+  supabaseUrl: "https://ikmikcmpjsgbbumsqxzg.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbWlrY21wanNnYmJ1bXNxeHpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMjgyNzksImV4cCI6MjEwNjYwNDI3OX0.cGuhGYlE7CPs5NggdwNB_D8soa8h4uaEZ75_xoE2a34"
+};
