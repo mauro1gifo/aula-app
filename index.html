@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Aula. cargando…</title></head><body style="background:#000;color:#fff;font-family:system-ui;padding:40px;text-align:center">
-<p>Cargando Aula…</p>
-<script>
-const PARTS = 11;
-async function go() {
-  let s = "";
-  for (let i = 0; i < PARTS; i++) {
-    const r = await fetch("parts/p" + i + ".txt");
-    s += await r.text();
-  }
-  const bin = atob(s);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  const html = new TextDecoder().decode(bytes);
-  document.open();
-  document.write(html);
-  document.close();
-}
-go().catch(e => { document.body.innerHTML = "<p>Error: "+e+"</p>"; });
-</script>
-</body></html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Aula.</title>
+<style>
+body{font-family:-apple-system,system-ui,sans-serif;background:#000;color:#fff;margin:0;padding:48px 24px;line-height:1.5;max-width:520px;margin-inline:auto}
+h1{font-size:2.8rem;letter-spacing:-0.04em;margin:0 0 8px}
+a{color:#0A84FF;text-decoration:none}
+.box{background:#1C1C1E;border-radius:16px;padding:18px 20px;margin:24px 0}
+code{background:#2C2C2E;padding:2px 7px;border-radius:6px;font-size:0.88em}
+ol{padding-left:1.2em}
+</style>
+</head>
+<body>
+<h1>Aula.</h1>
+<p style="color:#8E8E93">Chat en grupo para clases · canales · horario · anclas · Funko</p>
+<div class="box">
+<p><strong>Repositorio listo</strong> con esquema Supabase y config de Vercel.</p>
+<p>Para la <strong>app completa</strong> (un solo <code>index.html</code> de ~62&nbsp;KB):</p>
+<ol>
+<li>En GitHub: <em>Add file → Upload files</em></li>
+<li>Sube el <code>index.html</code> de la app y reemplaza este</li>
+<li>O clona el repo y haz <code>git push</code> con ese archivo</li>
+</ol>
+<p>Luego: <code>npx vercel --prod</code> o conecta el repo en Vercel.</p>
+</div>
+<p><a href="https://github.com/mauro1gifo/aula-app">github.com/mauro1gifo/aula-app</a></p>
+<p style="color:#8E8E93;font-size:0.9rem;margin-top:32px">cloud/schema.sql · vercel.json · README</p>
+</body>
+</html>
